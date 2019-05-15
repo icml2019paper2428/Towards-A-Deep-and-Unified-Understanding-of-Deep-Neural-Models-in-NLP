@@ -47,7 +47,7 @@ interpreter.visualize()
 ```
 Then, we can get results below:
 
-![](img/result.png)
+![](img/result.PNG)
 
 which means that the second and forth words are most important to $\Phi$, which is reasonable because the weight of them are larger.
 
