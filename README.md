@@ -15,16 +15,43 @@ numpy
 tqdm
 ```
 
-You may also install jupyter notebook to visit our [torturial](Torturial.ipynb).
+You may also need to install jupyter notebook to visit our [torturial](Torturial.ipynb).
 
 ## How to use
 
-We provide a small example on how to use our method for explaining the provided $\\Phi$ function on a given $\bf x$ [here](Torturial.ipynb).
+The important class we need to utilize is the `Interpreter` in [Interpreter.py](Interpreter.py). Suppose the $\Phi$, the input $\bf x$ and the input words are defined as:
+```
+import torch
 
-## To-do list
+x = torch.randn(5,256) / 10
+words = ['1','2','3','4','5']
 
-- Add an intuitive torturial in readme.md
+def Phi(x):
+    W = torch.tensor([10., 20., 5., -20., -10.]).to(device)
+    return W @ x
+```
 
-- Add a torturial on how to visualize one model we have trained.
+To explain this case, we need to initialize an `Interpreter` class, and pass $\bf x$ and $\Phi$ to it:
+```
+from Interpreter import Interpreter
 
-- Add more documentations to code.
+interpreter = Interpreter(x=x, Phi=Phi, words=words)
+```
+Then, we need the interpreter to optimize itself by minimizing the loss function in paper.
+```
+interpreter.optimize(iteration=5000, lr=0.01, show_progress=True)
+```
+Now, we can get the explanation by calling the visualize function:
+```
+interpreter.visualize()
+```
+Then, we can get results below:
+
+![](img/result.png)
+
+which means that the second and forth words are most important to $\Phi$, which is reasonable because the weight of them are larger.
+
+## Explain certain layer in pre-trained BERT model
+
+We provide an example on how to use our method to explain a certain layer in pre-trained BERT model [here](Torturial_BERT.ipynb). 
+> NOTE: This result may not be consistent with the result in the paper because  we use the pre-trained BERT model directly for simplicity, while the BERT model we use in paper is fine-tuned on specific dataset like SST-2.
