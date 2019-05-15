@@ -47,7 +47,7 @@ interpreter.get_sigma()
 ```
 the result will be something like:
 ```
-array([0.2203494 , 0.19501153, 0.19684102, 0.28645414, 0.24175803,
+array([0.2203494, 0.19501153, 0.19684102, 0.28645414, 0.24175803,
     0.25448853, 0.23727599, 0.18001308, 0.30041832, 0.28238717,
     0.29902193, 0.16674334, 0.32668313, 0.4206538 ], dtype=float32)
 ```
@@ -65,5 +65,5 @@ which means that the second and forth words are most important to $\Phi$, which 
 
 ## Explain a certain layer in any saved pytorch model
 
-We provide an example on how to use our method to explain a saved pytorch model(*pre-trained BERT model in our case*) [here](Torturial_BERT.ipynb). 
+We provide an example on how to use our method to explain a saved pytorch model (*pre-trained BERT model in our case*) [here](Torturial_BERT.ipynb). 
 > NOTE: This result may not be consistent with the result in the paper because  we use the pre-trained BERT model directly for simplicity, while the BERT model we use in paper is fine-tuned on specific dataset like SST-2.
