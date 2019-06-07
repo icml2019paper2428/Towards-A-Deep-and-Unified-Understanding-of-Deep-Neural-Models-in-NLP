@@ -23,7 +23,10 @@ The important class we need to utilize is the `Interpreter` in [Interpreter.py](
 ```
 import torch
 
-x = torch.randn(5,256) / 10
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+x = torch.randn(5,256) / 100
+x = x.to(device)
 words = ['1','2','3','4','5']
 
 def Phi(x):
@@ -31,15 +34,26 @@ def Phi(x):
     return W @ x
 ```
 
-To explain this case, we need to initialize an `Interpreter` class, and pass $\bf x$ and $\Phi$ to it:
+To explain a certain hidden state, we also need to get the variance of it for regularization. We provide a simple tool in `Interpreter.py` for calculating regularization. You just need to provide your sampled x as a list and your Phi. Like below:
+
+```
+from Interpreter import calculate_regularization
+
+# here we sample input x using random for simplicity
+sampled_x = [torch.randn(5,256) / 100 for _ in range(100)]
+
+regularization = calculate_regularization(sampled_x, Phi, device=device)
+```
+
+To explain this case, we need to initialize an `Interpreter` class, and pass $\bf x$, regularization and $\Phi$ to it (we also need to set hyper-parameter scale to a reasonable value: 10 * Std[embedding] is recommanded):
 ```
 from Interpreter import Interpreter
 
-interpreter = Interpreter(x=x, Phi=Phi, words=words)
+interpreter = Interpreter(x=x, Phi=Phi, regularization=regularization, scale=10 * 0.1, words=words).to(device)
 ```
 Then, we need the interpreter to optimize itself by minimizing the loss function in paper.
 ```
-interpreter.optimize(iteration=5000, lr=0.01, show_progress=True)
+interpreter.optimize(iteration=5000, lr=0.5, show_progress=True)
 ```
 After optimizing, we can get the best sigma:
 ```
@@ -47,9 +61,7 @@ interpreter.get_sigma()
 ```
 the result will be something like:
 ```
-array([0.2203494, 0.19501153, 0.19684102, 0.28645414, 0.24175803,
-    0.25448853, 0.23727599, 0.18001308, 0.30041832, 0.28238717,
-    0.29902193, 0.16674334, 0.32668313, 0.4206538 ], dtype=float32)
+array([0.00315634, 0.00181308, 0.00633237, 0.00174878, 0.0030807 ], dtype=float32)
 ```
 Every sigma stands for the change limit of input without changing hidden state too much. The smaller the sigma is, the more this input word contributes to the hidden state.
 
